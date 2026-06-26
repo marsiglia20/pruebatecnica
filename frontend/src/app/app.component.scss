@@ -1,0 +1,8 @@
+main {
+  min-height: 100vh;
+
+  &.with-navbar {
+    min-height: calc(100vh - 64px);
+    padding-top: 0;
+  }
+}

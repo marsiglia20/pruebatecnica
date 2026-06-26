@@ -1,0 +1,153 @@
+<div class="page-content">
+
+  <!-- Back -->
+  <button mat-button (click)="location.back()" class="back-btn">
+    <mat-icon>arrow_back</mat-icon> Volver
+  </button>
+
+  <!-- Loading -->
+  <div class="center-spinner" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <mat-card *ngIf="error" class="error-card">
+    <mat-card-content>
+      <mat-icon color="warn">error_outline</mat-icon>
+      No se encontró la orden.
+    </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="!loading && orden">
+
+    <!-- Header card -->
+    <mat-card class="mat-elevation-z2 header-card">
+      <mat-card-content>
+        <div class="header-row">
+          <div>
+            <h2 class="mat-headline-5" style="margin:0">{{ orden.codigo }}</h2>
+            <span class="badge" [ngClass]="getEstadoClass(orden.estado)">
+              {{ getEstadoLabel(orden.estado) }}
+            </span>
+          </div>
+          <div class="header-meta">
+            <div class="meta-item">
+              <mat-icon>window</mat-icon>
+              <span>{{ orden.total_ventanas }} ventanas</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>inventory_2</mat-icon>
+              <span>{{ orden.ventanas_empacadas }} empacadas</span>
+            </div>
+            <div class="meta-item" *ngIf="orden.fecha_completada">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ orden.fecha_completada | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>calendar_today</mat-icon>
+              <span>{{ orden.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global progress -->
+        <div class="progress-section">
+          <div class="progress-row">
+            <span class="mat-subtitle-1">Avance Total</span>
+            <strong>{{ orden.porcentaje_avance }}%</strong>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="orden.porcentaje_avance"
+            [color]="getProgressColor(orden.porcentaje_avance)"
+            class="progress-lg">
+          </mat-progress-bar>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Station distribution -->
+    <div class="station-grid">
+      <mat-card class="station-card mat-elevation-z2" *ngFor="let est of ESTACIONES">
+        <mat-card-content class="station-content">
+          <div class="station-count">{{ getCount(est) }}</div>
+          <div class="station-name">
+            <span class="badge" [ngClass]="getEstacionClass(est)">{{ est }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="station-card mat-elevation-z2">
+        <mat-card-content class="station-content">
+          <div class="station-count">{{ getCount('sin_iniciar') }}</div>
+          <div class="station-name">
+            <span class="badge badge-sin-iniciar">Sin iniciar</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Windows table -->
+    <mat-card class="mat-elevation-z2" style="margin-top: 24px;">
+      <mat-card-header>
+        <mat-card-title>Ventanas ({{ orden.ventanas.length }})</mat-card-title>
+        <div class="card-header-actions">
+          <mat-form-field appearance="outline" class="table-filter">
+            <mat-label>Filtrar</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="UUID, estación...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="ventanasDS" class="full-width">
+
+            <ng-container matColumnDef="identificador_unico">
+              <th mat-header-cell *matHeaderCellDef>UUID</th>
+              <td mat-cell *matCellDef="let v">
+                <code class="uuid-code">{{ v.identificador_unico | slice:0:18 }}...</code>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estacion_actual">
+              <th mat-header-cell *matHeaderCellDef>Estación Actual</th>
+              <td mat-cell *matCellDef="let v">
+                <span class="badge" [ngClass]="getEstacionClass(v.estacion_actual?.nombre ?? null)">
+                  {{ v.estacion_actual?.nombre ?? 'Sin iniciar' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="empacada">
+              <th mat-header-cell *matHeaderCellDef>Empacada</th>
+              <td mat-cell *matCellDef="let v">
+                <mat-icon [color]="v.empacada ? 'primary' : ''">
+                  {{ v.empacada ? 'check_circle' : 'radio_button_unchecked' }}
+                </mat-icon>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let v" class="mat-column-acciones">
+                <button mat-icon-button color="primary" (click)="verVentana(v)" matTooltip="Ver trazabilidad">
+                  <mat-icon>qr_code_scanner</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="ventanaCols"></tr>
+            <tr mat-row *matRowDef="let v; columns: ventanaCols;" (click)="verVentana(v)" class="clickable-row"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-data-cell" [attr.colspan]="ventanaCols.length">
+                No hay ventanas que coincidan con el filtro.
+              </td>
+            </tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </ng-container>
+</div>

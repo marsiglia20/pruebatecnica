@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">add_box</mat-icon>
+  Nueva Orden de Producción
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="crearForm" (ngSubmit)="crear()">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Código de Orden</mat-label>
+      <input matInput formControlName="codigo" placeholder="Ej: ORD-2024-001" maxlength="50">
+      <mat-hint align="end">{{ form.get('codigo')?.value?.length ?? 0 }}/50</mat-hint>
+      <mat-error *ngIf="form.get('codigo')?.hasError('required')">El código es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width" style="margin-top: 8px;">
+      <mat-label>Cantidad de Ventanas</mat-label>
+      <input matInput type="number" formControlName="total_ventanas"
+             placeholder="Ej: 20" min="1" max="10000">
+      <mat-icon matSuffix>window</mat-icon>
+      <mat-error *ngIf="form.get('total_ventanas')?.hasError('required')">Cantidad obligatoria.</mat-error>
+      <mat-error *ngIf="form.get('total_ventanas')?.hasError('min')">Mínimo 1 ventana.</mat-error>
+      <mat-error *ngIf="form.get('total_ventanas')?.hasError('max')">Máximo 10.000.</mat-error>
+    </mat-form-field>
+
+    <p class="info-note mat-caption">
+      <mat-icon>info</mat-icon>
+      Se generará un código QR único para cada ventana al crear la orden.
+    </p>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()" [disabled]="loading">Cancelar</button>
+  <button mat-raised-button color="primary"
+          form="crearForm" type="submit"
+          [disabled]="form.invalid || loading">
+    <mat-spinner diameter="16" *ngIf="loading" style="display:inline-block"></mat-spinner>
+    <mat-icon *ngIf="!loading">check</mat-icon>
+    {{ loading ? 'Creando...' : 'Crear Orden' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,110 @@
+<div class="page-content">
+
+  <div class="page-header">
+    <h2 class="mat-headline-5">Dashboard de Producción</h2>
+    <span class="mat-body-2">Resumen global en tiempo real</span>
+  </div>
+
+  <!-- Loading -->
+  <div class="center-spinner" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <mat-card *ngIf="error" class="error-card">
+    <mat-card-content>
+      <mat-icon color="warn">error_outline</mat-icon>
+      No se pudo cargar el dashboard. Verificar conexión con el servidor.
+    </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="!loading && resumen">
+
+    <!-- KPI Cards -->
+    <div class="grid-4" style="margin-bottom: 24px;">
+      <mat-card class="stat-card mat-elevation-z2">
+        <div class="stat-value text-primary">{{ resumen.total_ordenes }}</div>
+        <div class="stat-label">Total Órdenes</div>
+      </mat-card>
+
+      <mat-card class="stat-card mat-elevation-z2">
+        <div class="stat-value" style="color: #1565c0">{{ resumen.ordenes_activas }}</div>
+        <div class="stat-label">Órdenes Activas</div>
+      </mat-card>
+
+      <mat-card class="stat-card mat-elevation-z2">
+        <div class="stat-value" style="color: #2e7d32">{{ resumen.ordenes_completadas }}</div>
+        <div class="stat-label">Completadas</div>
+      </mat-card>
+
+      <mat-card class="stat-card mat-elevation-z2">
+        <div class="stat-value" style="color: #e65100">{{ resumen.total_ventanas }}</div>
+        <div class="stat-label">Total Ventanas</div>
+      </mat-card>
+    </div>
+
+    <!-- Global progress -->
+    <mat-card class="mat-elevation-z2" style="margin-bottom: 24px; padding: 20px;">
+      <div class="progress-header">
+        <span class="mat-subtitle-1">Avance Global</span>
+        <span class="progress-pct mat-headline-6">{{ resumen.porcentaje_global }}%</span>
+      </div>
+      <mat-progress-bar
+        [color]="progressColor"
+        mode="determinate"
+        [value]="resumen.porcentaje_global"
+        class="progress-bar-lg">
+      </mat-progress-bar>
+      <div class="progress-detail mat-caption" style="margin-top: 6px;">
+        {{ resumen.ventanas_empacadas }} / {{ resumen.total_ventanas }} ventanas empacadas
+      </div>
+    </mat-card>
+
+    <!-- Chart + station detail -->
+    <div class="grid-2">
+      <mat-card class="mat-elevation-z2">
+        <mat-card-header>
+          <mat-card-title>Ventanas por Estación</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #barCanvas></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="mat-elevation-z2">
+        <mat-card-header>
+          <mat-card-title>Detalle por Estación</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let item of resumen.ventanas_por_estacion | keyvalue">
+              <mat-icon matListItemIcon>
+                {{ item.key === 'Empaque' ? 'inventory_2' :
+                   item.key === 'Ensamble' ? 'build' :
+                   item.key === 'Troquel' ? 'hardware' :
+                   item.key === 'Corte' ? 'content_cut' : 'hourglass_empty' }}
+              </mat-icon>
+              <div matListItemTitle>{{ item.key }}</div>
+              <div matListItemLine class="mat-body-2">{{ item.value }} ventana(s)</div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <button mat-raised-button color="primary" routerLink="/ordenes">
+        <mat-icon>assignment</mat-icon>
+        Ver Órdenes
+      </button>
+      <button mat-raised-button color="accent" routerLink="/ventanas">
+        <mat-icon>qr_code_scanner</mat-icon>
+        Consultar Ventana
+      </button>
+    </div>
+
+  </ng-container>
+</div>

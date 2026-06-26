@@ -1,0 +1,56 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-icon { font-size: 28px; }
+.brand-name { font-size: 1.1rem; font-weight: 500; }
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin-left: 24px;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+    font-size: 0.9rem;
+
+    &.nav-active {
+      opacity: 1;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.user-rol {
+  opacity: 0.75;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .nav-links span,
+  .user-name,
+  .user-rol { display: none; }
+}

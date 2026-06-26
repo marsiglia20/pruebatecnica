@@ -1,0 +1,150 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$tg-primary: mat.define-palette(mat.$blue-palette, 800, 600, 900);
+$tg-accent:  mat.define-palette(mat.$orange-palette, 700, 500, 900);
+$tg-warn:    mat.define-palette(mat.$red-palette);
+
+$theme: mat.define-light-theme((
+  color: (primary: $tg-primary, accent: $tg-accent, warn: $tg-warn),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($theme);
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: #f5f5f5;
+}
+
+/* Layout */
+.page-content {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.spacer { flex: 1 1 auto; }
+.full-width { width: 100%; }
+
+/* Status badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pendiente  { background: #e0e0e0; color: #616161; }
+.badge-proceso    { background: #e3f2fd; color: #1565c0; }
+.badge-completada { background: #e8f5e9; color: #2e7d32; }
+
+/* Station badges */
+.badge-sin-iniciar { background: #f5f5f5; color: #9e9e9e; }
+.badge-corte       { background: #eceff1; color: #455a64; }
+.badge-troquel     { background: #e3f2fd; color: #1565c0; }
+.badge-ensamble    { background: #fff3e0; color: #e65100; }
+.badge-empaque     { background: #e8f5e9; color: #2e7d32; }
+
+/* Cards */
+.stat-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(0,0,0,.54);
+  margin-top: 6px;
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .page-content { padding: 12px; }
+}
+
+/* MAT overrides */
+.mat-mdc-row:hover { background: rgba(0,0,0,.04); cursor: pointer; }
+
+.mat-column-acciones { width: 80px; text-align: right; }
+
+/* Timeline */
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 16px;
+  padding: 0 0 20px 0;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1565c0;
+  color: white;
+  flex-shrink: 0;
+  z-index: 1;
+  font-size: 18px;
+}
+
+.timeline-body {
+  flex: 1;
+  padding-top: 8px;
+}
+
+.timeline-title {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.timeline-meta {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,.54);
+  margin-top: 2px;
+}

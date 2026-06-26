@@ -1,0 +1,154 @@
+<div class="page-content">
+
+  <h2 class="mat-headline-5">Consulta de Ventana</h2>
+  <p class="mat-body-2">Ingresa el UUID de la ventana para ver su trazabilidad completa.</p>
+
+  <!-- Search bar -->
+  <mat-card class="search-card mat-elevation-z2">
+    <mat-card-content>
+      <div class="search-row">
+        <mat-form-field appearance="outline" class="uuid-field">
+          <mat-label>UUID de la Ventana</mat-label>
+          <input matInput [formControl]="uuidCtrl"
+                 placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                 (keyup.enter)="buscar()">
+          <mat-icon matSuffix>qr_code</mat-icon>
+          <mat-error *ngIf="uuidCtrl.hasError('required')">El UUID es obligatorio.</mat-error>
+          <mat-error *ngIf="uuidCtrl.hasError('pattern')">Formato UUID inválido.</mat-error>
+          <mat-hint>Escanea el QR o ingresa el ID manualmente</mat-hint>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="buscar()"
+                [disabled]="uuidCtrl.invalid || searching">
+          <mat-spinner diameter="18" *ngIf="searching" style="display:inline-block"></mat-spinner>
+          <mat-icon *ngIf="!searching">search</mat-icon>
+          {{ searching ? 'Buscando...' : 'Consultar' }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error -->
+  <mat-card *ngIf="errorMsg" class="error-card mat-elevation-z2">
+    <mat-card-content>
+      <mat-icon color="warn">error_outline</mat-icon>
+      {{ errorMsg }}
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Result -->
+  <ng-container *ngIf="historial">
+
+    <!-- Window info -->
+    <mat-card class="result-card mat-elevation-z2">
+      <mat-card-content>
+        <div class="ventana-header">
+          <div>
+            <div class="mat-caption" style="color: rgba(0,0,0,.54)">Identificador</div>
+            <code class="uuid-full">{{ historial.ventana.identificador_unico }}</code>
+          </div>
+          <div class="ventana-status">
+            <span class="badge" [ngClass]="getEstacionClass(historial.ventana.estacion_actual?.nombre ?? null)">
+              {{ historial.ventana.estacion_actual?.nombre ?? 'Sin iniciar' }}
+            </span>
+            <span class="badge badge-completada" *ngIf="historial.ventana.empacada">
+              <mat-icon style="font-size:14px;height:14px;width:14px">check_circle</mat-icon>
+              Empacada
+            </span>
+          </div>
+        </div>
+
+        <!-- Station stepper -->
+        <div class="station-stepper">
+          <div class="step" *ngFor="let est of ESTACIONES; let i = index"
+               [class.step-done]="i <= estacionActualIdx"
+               [class.step-active]="i === estacionActualIdx">
+            <div class="step-circle">
+              <mat-icon *ngIf="i < estacionActualIdx">check</mat-icon>
+              <span *ngIf="i >= estacionActualIdx">{{ i + 1 }}</span>
+            </div>
+            <div class="step-label">{{ est }}</div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="ventana-actions" *ngIf="!historial.ventana.empacada">
+          <button mat-raised-button color="primary" (click)="avanzar()"
+                  [disabled]="loading || !siguienteEstacion">
+            <mat-icon>arrow_forward</mat-icon>
+            Avanzar a {{ siguienteEstacion?.nombre ?? '—' }}
+          </button>
+          <button mat-stroked-button (click)="verQR()">
+            <mat-icon>qr_code</mat-icon>
+            Ver QR
+          </button>
+        </div>
+
+        <div class="empacada-banner" *ngIf="historial.ventana.empacada">
+          <mat-icon>inventory_2</mat-icon>
+          Ventana completamente empacada – proceso terminado.
+        </div>
+
+        <!-- QR display -->
+        <div class="qr-container" *ngIf="showQr && qrUrl">
+          <mat-divider style="margin: 16px 0;"></mat-divider>
+          <div class="mat-caption" style="margin-bottom: 8px;">Código QR</div>
+          <img [src]="qrUrl" alt="QR Code" class="qr-image">
+          <div>
+            <a [href]="qrUrl" download mat-stroked-button target="_blank">
+              <mat-icon>download</mat-icon>
+              Descargar QR
+            </a>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- History timeline -->
+    <mat-card class="mat-elevation-z2" style="margin-top: 24px;">
+      <mat-card-header>
+        <mat-card-title>
+          Historial de Trazabilidad ({{ historial.movimientos.length }} movimiento(s))
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+
+        <!-- Empty state -->
+        <div class="no-history" *ngIf="historial.movimientos.length === 0">
+          <mat-icon>history_toggle_off</mat-icon>
+          <p>Ventana creada pero sin movimientos aún.</p>
+        </div>
+
+        <!-- Timeline -->
+        <ul class="timeline" *ngIf="historial.movimientos.length > 0">
+          <li class="timeline-item" *ngFor="let mov of historial.movimientos">
+            <div class="timeline-dot">
+              <mat-icon>
+                {{ mov.estacion_nombre === 'Empaque' ? 'inventory_2' :
+                   mov.estacion_nombre === 'Ensamble' ? 'build' :
+                   mov.estacion_nombre === 'Troquel' ? 'hardware' : 'content_cut' }}
+              </mat-icon>
+            </div>
+            <div class="timeline-body">
+              <div class="timeline-title">
+                {{ mov.estacion_nombre }}
+                <span class="mat-caption" style="margin-left:8px; color: rgba(0,0,0,.54);">
+                  {{ mov.fecha_movimiento | date:'dd/MM/yyyy HH:mm:ss' }}
+                </span>
+              </div>
+              <div class="timeline-meta">
+                <mat-icon style="font-size:14px;height:14px;width:14px">person</mat-icon>
+                {{ mov.nombre_completo || mov.usuario_responsable }}
+                <span *ngIf="mov.observaciones" style="margin-left: 12px;">
+                  · {{ mov.observaciones }}
+                </span>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+      </mat-card-content>
+    </mat-card>
+
+  </ng-container>
+</div>

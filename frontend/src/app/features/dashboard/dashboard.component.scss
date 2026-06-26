@@ -1,0 +1,52 @@
+.page-header {
+  margin-bottom: 24px;
+
+  h2 { margin: 0 0 4px; }
+}
+
+.center-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.error-card {
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #c62828;
+  }
+}
+
+.text-primary { color: #1565c0; }
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-pct { font-weight: 700; }
+
+.progress-bar-lg {
+  height: 10px !important;
+  border-radius: 5px;
+}
+
+::ng-deep .progress-bar-lg .mdc-linear-progress__buffer-bar {
+  border-radius: 5px;
+}
+
+.chart-container {
+  position: relative;
+  height: 260px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}

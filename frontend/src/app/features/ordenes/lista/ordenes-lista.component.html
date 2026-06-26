@@ -1,0 +1,110 @@
+<div class="page-content">
+
+  <div class="list-header">
+    <h2 class="mat-headline-5">Órdenes de Producción</h2>
+
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Código, estado...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="cargar()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon> Actualizar
+      </button>
+
+      <button mat-raised-button color="accent" (click)="crearOrden()">
+        <mat-icon>add</mat-icon> Nueva Orden
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="center-spinner" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Table -->
+  <mat-card class="mat-elevation-z2 table-card" *ngIf="!loading">
+    <mat-card-content>
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="dataSource" matSort class="full-width">
+
+          <!-- Código -->
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+            <td mat-cell *matCellDef="let o">
+              <strong>{{ o.codigo }}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Estado -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+            <td mat-cell *matCellDef="let o">
+              <span class="badge" [ngClass]="getEstadoClass(o.estado)">
+                {{ getEstadoLabel(o.estado) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Total -->
+          <ng-container matColumnDef="total_ventanas">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Ventanas</th>
+            <td mat-cell *matCellDef="let o">{{ o.total_ventanas }}</td>
+          </ng-container>
+
+          <!-- Avance -->
+          <ng-container matColumnDef="avance">
+            <th mat-header-cell *matHeaderCellDef>Avance</th>
+            <td mat-cell *matCellDef="let o" class="avance-cell">
+              <div class="avance-label">
+                {{ o.porcentaje_avance }}%
+                <span class="mat-caption">({{ o.ventanas_empacadas }}/{{ o.total_ventanas }})</span>
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="o.porcentaje_avance"
+                [color]="getProgressColor(o.porcentaje_avance)">
+              </mat-progress-bar>
+            </td>
+          </ng-container>
+
+          <!-- Fecha -->
+          <ng-container matColumnDef="fecha_creacion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Creación</th>
+            <td mat-cell *matCellDef="let o">
+              {{ o.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+          </ng-container>
+
+          <!-- Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let o" class="mat-column-acciones">
+              <button mat-icon-button color="primary" (click)="verDetalle(o)" matTooltip="Ver detalle">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let o; columns: columns;" (click)="verDetalle(o)" class="clickable-row"></tr>
+
+          <!-- No data -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data-cell" [attr.colspan]="columns.length">
+              <mat-icon>inbox</mat-icon>
+              No hay órdenes
+              <span *ngIf="filterValue">que coincidan con "{{ filterValue }}"</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+    </mat-card-content>
+  </mat-card>
+
+</div>

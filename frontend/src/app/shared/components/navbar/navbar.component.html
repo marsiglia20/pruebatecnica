@@ -1,0 +1,33 @@
+<mat-toolbar color="primary" class="navbar">
+  <div class="brand">
+    <mat-icon class="brand-icon">factory</mat-icon>
+    <span class="brand-name">Tecnoglass</span>
+  </div>
+
+  <nav class="nav-links">
+    <a mat-button routerLink="/dashboard" routerLinkActive="nav-active">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+    <a mat-button routerLink="/ordenes" routerLinkActive="nav-active">
+      <mat-icon>assignment</mat-icon>
+      Órdenes
+    </a>
+    <a mat-button routerLink="/ventanas" routerLinkActive="nav-active">
+      <mat-icon>qr_code_scanner</mat-icon>
+      Ventanas
+    </a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  <div class="user-info" *ngIf="user">
+    <mat-icon>person</mat-icon>
+    <span class="user-name">{{ user.nombre_completo }}</span>
+    <span class="user-rol mat-caption">({{ user.rol }})</span>
+  </div>
+
+  <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
